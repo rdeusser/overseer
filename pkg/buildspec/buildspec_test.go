@@ -9,12 +9,12 @@ import (
 func TestParse(t *testing.T) {
 	cases := []struct {
 		File     string
-		Expected *BuildSpec
+		Expected *Spec
 		Err      bool
 	}{
 		{
 			"virtualspec",
-			&BuildSpec{
+			&Spec{
 				Hosts: []string{
 					"hello.qa.local",
 					"lol.qa.local",
@@ -28,7 +28,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			"physicalspec",
-			&BuildSpec{
+			&Spec{
 				Hosts: []string{
 					"hello.qa.local",
 					"lol.qa.local",

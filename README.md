@@ -5,7 +5,7 @@
 A provisioning toolkit.
 
 Overseer uses something called a "hostspec" to determine how to build a physical or virtual machine.
-Server names are read from the command line or another kind of spec called a "buildspec".
+Server names are read from another kind of spec called a "buildspec".
 
 A hostspec looks like this:
 ```hcl
@@ -86,3 +86,9 @@ The one big difference and the reason I created this was because Terraform curre
 Overseer does not and will never maintain state of any kind. The idea here is that you pass a list of hostnames
 (or use a buildspec) and a hostspec that describes the kind of build you want and it'll go through and create
 all of the necessary resources for you.
+
+
+## Notes
+* Right now, the pipeline is done manually inside the CLI code. It's a little messy now, but it'll get bad the more
+things get added. The solution is most likely going to be a pipeline of some sort where things can be ordered.
+This way we can implement generic functions to use inside the CLI to keep that from getting messy.

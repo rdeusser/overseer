@@ -1,0 +1,13 @@
+language: go
+
+go:
+  - 1.6.x
+  - 1.7.x
+  - master
+
+branches:
+  only:
+    - master
+
+script:
+  - make test

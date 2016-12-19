@@ -1,0 +1,13 @@
+.DS_Store
+bin/
+.vagrant/
+*.backup
+*.log
+*.bak
+*~
+.*.swp
+.idea
+*.iml
+*.test
+*.iml
+*overseer*

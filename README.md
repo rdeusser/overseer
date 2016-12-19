@@ -5,7 +5,9 @@
 A provisioning toolkit.
 
 Overseer uses something called a "hostspec" to determine how to build a physical or virtual machine.
-Server names are read from another kind of spec called a "buildspec".
+Server names are read from another kind of spec called a "buildspec". All of your hostspecs should
+live inside a directory (e.g. /etc/overseer/hostspecs) and ideally would be version controlled in
+git. Each hostspec should represent an environment or type of host.
 
 A hostspec looks like this:
 ```hcl

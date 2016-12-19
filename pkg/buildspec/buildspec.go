@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-type BuildSpec struct {
+type Spec struct {
 	Hosts []string
 	MACs  []string
 }
 
-func ParseFile(path string) (*BuildSpec, error) {
+func ParseFile(path string) (*Spec, error) {
 	path, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func ParseFile(path string) (*BuildSpec, error) {
 		return nil, err
 	}
 
-	var spec BuildSpec
+	var spec Spec
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {

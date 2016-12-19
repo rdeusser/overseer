@@ -86,38 +86,8 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		// If there are arguments, then the user has specified a host on the
 		// command line rather than using a buildspec
 		if len(c.FlagSet.Args()) > 0 {
-			// Loop over all the hosts separated by a space
-			for _, host := range c.FlagSet.Args() {
-				cmd := &hammer.Hammer{
-					Username:          conf.Foreman.Username,
-					Password:          conf.Foreman.Password,
-					Hostname:          host,
-					Organization:      hspec.Foreman.Organization,
-					Location:          hspec.Foreman.Location,
-					Hostgroup:         hspec.Foreman.Hostgroup,
-					Environment:       hspec.Foreman.Environment,
-					PartitionTableID:  hspec.Foreman.PartitionTableID,
-					OperatingSystemID: hspec.Foreman.OperatingSystemID,
-					Medium:            hspec.Foreman.Medium,
-					ArchitectureID:    hspec.Foreman.ArchitectureID,
-					DomainID:          hspec.Foreman.DomainID,
-					ComputeProfile:    hspec.Foreman.ComputeProfile,
-					ComputeResource:   hspec.Foreman.ComputeResource,
-					Host: hammer.Host{
-						CPUs:   hspec.Virtual.CPUs,
-						Cores:  hspec.Virtual.Cores,
-						Memory: hspec.Virtual.Memory,
-						Disks:  hspec.Vsphere.Devices.Disks,
-					},
-				}
-
-				// Execute is a method that will send the command to a job queue
-				// to be processed by a goroutine. This way we can build more
-				// hosts at the same time by executing hammer in parallel.
-				if err := cmd.Execute(); err != nil {
-					log.Fatalf("error executing hammer: %s", err)
-				}
-			}
+			log.Errorf("Please use a buildspec instead of specifying hosts on the command line")
+			os.Exit(1)
 		} else {
 			// Parse the buildspec in the current directory to get a list of hosts
 			bspec, err := buildspec.ParseFile("./buildspec")
@@ -150,6 +120,9 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 					},
 				}
 
+				// Execute is a method that will send the command to a job queue
+				// to be processed by a goroutine. This way we can build more
+				// hosts at the same time by executing hammer in parallel.
 				if err := cmd.Execute(); err != nil {
 					log.Fatalf("error executing hammer: %s", err)
 				}

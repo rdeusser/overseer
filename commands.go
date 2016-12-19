@@ -4,16 +4,16 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/iamthemuffinman/cli"
-	"github.com/iamthemuffinman/overseer/command"
+	hashicli "github.com/iamthemuffinman/cli"
+	"github.com/iamthemuffinman/overseer/cli"
 )
 
-var Commands map[string]cli.CommandFactory
+var Commands map[string]hashicli.CommandFactory
 var PlumbingCommands map[string]struct{}
-var Ui cli.Ui
+var Ui hashicli.Ui
 
 func init() {
-	Ui = &cli.BasicUi{
+	Ui = &hashicli.BasicUi{
 		Reader:      os.Stdin,
 		Writer:      os.Stdout,
 		ErrorWriter: os.Stderr,
@@ -23,36 +23,36 @@ func init() {
 		"provision": {}, // inlcudes all subcommands
 	}
 
-	Commands = map[string]cli.CommandFactory{
-		"init": func() (cli.Command, error) {
-			return &command.InitCommand{
+	Commands = map[string]hashicli.CommandFactory{
+		"init": func() (hashicli.Command, error) {
+			return &cli.InitCommand{
 				Ui: Ui,
 			}, nil
 		},
 
-		"version": func() (cli.Command, error) {
-			return &command.VersionCommand{
+		"version": func() (hashicli.Command, error) {
+			return &cli.VersionCommand{
 				Ui:       Ui,
 				Revision: GitCommit,
 				Version:  Version,
 			}, nil
 		},
 
-		"provision": func() (cli.Command, error) {
-			return &command.ProvisionCommand{
+		"provision": func() (hashicli.Command, error) {
+			return &cli.ProvisionCommand{
 				Ui: Ui,
 			}, nil
 		},
 
-		"provision virtual": func() (cli.Command, error) {
-			return &command.ProvisionVirtualCommand{
+		"provision virtual": func() (hashicli.Command, error) {
+			return &cli.ProvisionVirtualCommand{
 				Ui:         Ui,
 				ShutdownCh: makeShutdownCh(),
 			}, nil
 		},
 
-		"provision physical": func() (cli.Command, error) {
-			return &command.ProvisionPhysicalCommand{
+		"provision physical": func() (hashicli.Command, error) {
+			return &cli.ProvisionPhysicalCommand{
 				Ui:         Ui,
 				ShutdownCh: makeShutdownCh(),
 			}, nil

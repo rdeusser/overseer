@@ -27,14 +27,14 @@ func TestParse(t *testing.T) {
 					Memory:     8096,
 					Devices: Devices{
 						Disks: []*Disk{
-							&Disk{
+							{
 								DeviceName: "Hard disk 1",
 								DeviceType: "disk",
 								Size:       40,
 							},
 						},
 						Networks: []*Network{
-							&Network{
+							{
 								DeviceName: "Network adapter 1",
 								DeviceType: "network",
 								BuildVLAN:  "dv-build",
@@ -43,7 +43,7 @@ func TestParse(t *testing.T) {
 							},
 						},
 						SCSIs: []*SCSI{
-							&SCSI{
+							{
 								DeviceName: "SCSI controller 1",
 								DeviceType: "scsi",
 								Type:       "paravirtual",
@@ -110,14 +110,14 @@ func TestParse(t *testing.T) {
 					Memory:     8096,
 					Devices: Devices{
 						Disks: []*Disk{
-							&Disk{
+							{
 								DeviceName: "Hard disk 1",
 								DeviceType: "disk",
 								Size:       40,
 							},
 						},
 						Networks: []*Network{
-							&Network{
+							{
 								DeviceName: "Network adapter 1",
 								DeviceType: "network",
 								BuildVLAN:  "dv-build",
@@ -126,7 +126,7 @@ func TestParse(t *testing.T) {
 							},
 						},
 						SCSIs: []*SCSI{
-							&SCSI{
+							{
 								DeviceName: "SCSI controller 1",
 								DeviceType: "scsi",
 								Type:       "paravirtual",
@@ -165,14 +165,14 @@ func TestParse(t *testing.T) {
 					Memory:     8096,
 					Devices: Devices{
 						Disks: []*Disk{
-							&Disk{
+							{
 								DeviceName: "Hard disk 1",
 								DeviceType: "disk",
 								Size:       40,
 							},
 						},
 						Networks: []*Network{
-							&Network{
+							{
 								DeviceName: "Network adapter 1",
 								DeviceType: "network",
 								BuildVLAN:  "dv-build",
@@ -181,7 +181,7 @@ func TestParse(t *testing.T) {
 							},
 						},
 						SCSIs: []*SCSI{
-							&SCSI{
+							{
 								DeviceName: "SCSI controller 1",
 								DeviceType: "scsi",
 								Type:       "paravirtual",
@@ -214,14 +214,14 @@ func TestParse(t *testing.T) {
 					Memory:     8096,
 					Devices: Devices{
 						Disks: []*Disk{
-							&Disk{
+							{
 								DeviceName: "Hard disk 1",
 								DeviceType: "disk",
 								Size:       40,
 							},
 						},
 						Networks: []*Network{
-							&Network{
+							{
 								DeviceName: "Network adapter 1",
 								DeviceType: "network",
 								BuildVLAN:  "dv-build",
@@ -230,7 +230,7 @@ func TestParse(t *testing.T) {
 							},
 						},
 						SCSIs: []*SCSI{
-							&SCSI{
+							{
 								DeviceName: "SCSI controller 1",
 								DeviceType: "scsi",
 								Type:       "paravirtual",
@@ -276,26 +276,26 @@ func TestParse(t *testing.T) {
 					Memory:     8096,
 					Devices: Devices{
 						Disks: []*Disk{
-							&Disk{
+							{
 								DeviceName: "Hard disk 1",
 								DeviceType: "disk",
 								Size:       40,
 							},
-							&Disk{
+							{
 								DeviceName: "Hard disk 2",
 								DeviceType: "disk",
 								Size:       200,
 							},
 						},
 						Networks: []*Network{
-							&Network{
+							{
 								DeviceName: "Network adapter 1",
 								DeviceType: "network",
 								BuildVLAN:  "dv-build",
 								VLAN:       "dv-appservers",
 								SwitchType: "distributed",
 							},
-							&Network{
+							{
 								DeviceName: "Network adapter 2",
 								DeviceType: "network",
 								BuildVLAN:  "",
@@ -304,12 +304,12 @@ func TestParse(t *testing.T) {
 							},
 						},
 						SCSIs: []*SCSI{
-							&SCSI{
+							{
 								DeviceName: "SCSI controller 1",
 								DeviceType: "scsi",
 								Type:       "paravirtual",
 							},
-							&SCSI{
+							{
 								DeviceName: "SCSI controller 2",
 								DeviceType: "scsi",
 								Type:       "paravirtual",

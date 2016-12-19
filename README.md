@@ -65,7 +65,7 @@ hello.qa.local 1C:29:DF:E5:AA:B5
 lol.qa.local 52:65:06:7A:C5:C8
 with1234.qa.local 37:25:61:C8:B5:9C
 nope.qa.local 19:62:AD:A7:92:BA
-sometimes@#$@#%123135.qa.local E5:CF:60:13:C2:3E
+sometimes123135.qa.local E5:CF:60:13:C2:3E
 ```
 
 A buildspec for a virtual host:
@@ -74,7 +74,7 @@ hello.qa.local
 lol.qa.local
 with1234.qa.local
 nope.qa.local
-sometimes@#$@#%123135.qa.local
+sometimes123135.qa.local
 ```
 
 ## Overseer kinda seems like Terraform?

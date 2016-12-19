@@ -126,6 +126,8 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 				if err := cmd.Execute(); err != nil {
 					log.Fatalf("error executing hammer: %s", err)
 				}
+
+				// Run chef/knife stuff here
 			}
 		}
 	}()

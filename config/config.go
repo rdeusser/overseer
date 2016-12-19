@@ -13,7 +13,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type Config struct {
+type Spec struct {
 	Foreman  Foreman  `mapstructure:"foreman"`
 	Knife    Knife    `mapstructure:"knife"`
 	Vsphere  Vsphere  `mapstructure:"vsphere"`
@@ -41,7 +41,7 @@ type Infoblox struct {
 }
 
 // ParseFile parses the given hostspec file.
-func ParseFile(path string) (*Config, error) {
+func ParseFile(path string) (*Spec, error) {
 	path, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func ParseFile(path string) (*Config, error) {
 //
 // Due to current internal limitations, the entire contents of the
 // io.Reader will be copied into memory first before parsing.
-func Parse(r io.Reader) (*Config, error) {
+func Parse(r io.Reader) (*Spec, error) {
 	// Copy the reader into an in-memory buffer first since HCL requires it.
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, r); err != nil {
@@ -91,30 +91,30 @@ func Parse(r io.Reader) (*Config, error) {
 		return nil, err
 	}
 
-	var config Config
+	var spec Spec
 
 	if o := list.Filter("foreman"); len(o.Items) > 0 {
-		if err := parseForeman(&config.Foreman, o); err != nil {
+		if err := parseForeman(&spec.Foreman, o); err != nil {
 			return nil, fmt.Errorf("error parsing foreman block: %s", err)
 		}
 	}
 	if o := list.Filter("knife"); len(o.Items) > 0 {
-		if err := parseKnife(&config.Knife, o); err != nil {
+		if err := parseKnife(&spec.Knife, o); err != nil {
 			return nil, fmt.Errorf("error parsing knife block: %s", err)
 		}
 	}
 	if o := list.Filter("vsphere"); len(o.Items) > 0 {
-		if err := parseVsphere(&config.Vsphere, o); err != nil {
+		if err := parseVsphere(&spec.Vsphere, o); err != nil {
 			return nil, fmt.Errorf("error parsing vsphere block: %s", err)
 		}
 	}
 	if o := list.Filter("infoblox"); len(o.Items) > 0 {
-		if err := parseInfoblox(&config.Infoblox, o); err != nil {
+		if err := parseInfoblox(&spec.Infoblox, o); err != nil {
 			return nil, fmt.Errorf("error parsing infoblox block: %s", err)
 		}
 	}
 
-	return &config, nil
+	return &spec, nil
 }
 
 func parseForeman(result *Foreman, list *ast.ObjectList) error {

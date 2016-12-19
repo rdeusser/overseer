@@ -9,12 +9,12 @@ import (
 func TestParse(t *testing.T) {
 	cases := []struct {
 		File     string
-		Expected *Config
+		Expected *Spec
 		Err      bool
 	}{
 		{
 			"complete.conf",
-			&Config{
+			&Spec{
 				Foreman: Foreman{
 					Username: "admin",
 					Password: "datpass",

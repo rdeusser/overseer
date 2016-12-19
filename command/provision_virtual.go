@@ -104,9 +104,9 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 					ComputeProfile:    hspec.Foreman.ComputeProfile,
 					ComputeResource:   hspec.Foreman.ComputeResource,
 					Host: hammer.Host{
-						CPUs:   hspec.Vsphere.CPUs,
-						Cores:  hspec.Vsphere.Cores,
-						Memory: hspec.Vsphere.Memory,
+						CPUs:   hspec.Virtual.CPUs,
+						Cores:  hspec.Virtual.Cores,
+						Memory: hspec.Virtual.Memory,
 						Disks:  hspec.Vsphere.Devices.Disks,
 					},
 				}
@@ -143,9 +143,9 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 					ComputeProfile:    hspec.Foreman.ComputeProfile,
 					ComputeResource:   hspec.Foreman.ComputeResource,
 					Host: hammer.Host{
-						CPUs:   hspec.Vsphere.CPUs,
-						Cores:  hspec.Vsphere.Cores,
-						Memory: hspec.Vsphere.Memory,
+						CPUs:   hspec.Virtual.CPUs,
+						Cores:  hspec.Virtual.Cores,
+						Memory: hspec.Virtual.Memory,
 						Disks:  hspec.Vsphere.Devices.Disks,
 					},
 				}

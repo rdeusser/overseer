@@ -10,10 +10,13 @@ Server names are read from the command line or another kind of spec called a "bu
 A hostspec looks like this:
 ```hcl
 spec "indy.prod.kafka" {
-    vsphere {
+    virtual {
         cpus = 2
         cores = 1
         memory = 8096
+    }
+
+    vsphere {
         domain = "qa.local"
         cluster = "cluster01"
         datastore = "ds01"

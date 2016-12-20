@@ -55,6 +55,7 @@ spec "indy.prod.kafka" {
     }
 
     chef {
+        environment = "qa"
         base_role = "baserole01"
         run_list = [
             "role[role01]",

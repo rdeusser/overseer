@@ -111,7 +111,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 
 		knifeCmd := &knife.Knife{
 			Hostname:    "",
-			Environment: "",
+			Environment: hspec.Chef.Environment,
 			BaseRole:    hspec.Chef.BaseRole,
 			RunList:     hspec.Chef.RunList,
 		}

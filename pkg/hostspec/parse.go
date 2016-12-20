@@ -43,8 +43,9 @@ type Foreman struct {
 }
 
 type Chef struct {
-	BaseRole string   `mapstructure:"base_role"`
-	RunList  []string `mapstructure:"run_list"`
+	Environment string   `mapstructure:"environment"`
+	BaseRole    string   `mapstructure:"base_role"`
+	RunList     []string `mapstructure:"run_list"`
 }
 
 type Vsphere struct {
@@ -290,6 +291,7 @@ func parseChef(result *Chef, list *ast.ObjectList) error {
 	o := list.Items[0]
 
 	valid := []string{
+		"environment",
 		"base_role",
 		"run_list",
 	}

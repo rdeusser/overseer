@@ -198,7 +198,8 @@ func TestParse(t *testing.T) {
 					},
 				},
 				Chef: Chef{
-					BaseRole: "baserole01",
+					Environment: "qa",
+					BaseRole:    "baserole01",
 					RunList: []string{
 						"role[role01]",
 						"role[role02]",
@@ -262,7 +263,8 @@ func TestParse(t *testing.T) {
 					Medium:            "centos-7",
 				},
 				Chef: Chef{
-					BaseRole: "baserole01",
+					Environment: "qa",
+					BaseRole:    "baserole01",
 					RunList: []string{
 						"role[role01]",
 						"role[role02]",
@@ -343,7 +345,8 @@ func TestParse(t *testing.T) {
 					Medium:            "centos-7",
 				},
 				Chef: Chef{
-					BaseRole: "baserole01",
+					Environment: "qa",
+					BaseRole:    "baserole01",
 					RunList: []string{
 						"role[role01]",
 						"role[role02]",

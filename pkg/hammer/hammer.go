@@ -1,9 +1,11 @@
 package hammer
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/iamthemuffinman/overseer/pkg/hostspec"
@@ -57,7 +59,6 @@ func (h *Hammer) joinComputeAttributes() string {
 }
 
 func (h *Hammer) Execute() error {
-
 	// Build massive hammer command
 	// I can't wait for this to be replace by go-foreman
 	hammer := exec.Command("hammer", fmt.Sprintf(`-u %q -p %q host create --name %q --organization %q --location %q
@@ -79,4 +80,31 @@ func (h *Hammer) Execute() error {
 	workerpool.JobQueue <- job
 
 	return nil
+}
+
+func (h *Hammer) GetBuildStatus() (int, error) {
+	hammer := exec.Command("hammer", fmt.Sprintf(`-u %q -p %q host info --name %q | grep "Build" | grep -ic "yes"`, h.Username, h.Password, h.Hostname))
+
+	var buf bytes.Buffer
+
+	hammer.Stdout = &buf
+	hammer.Stderr = os.Stderr
+
+	log.Infof("Executing: %s", strings.Join(hammer.Args, " "))
+
+	// Create a job to run the hammer command
+	job := workerpool.Job{Command: hammer}
+
+	// Push the job onto the queue
+	workerpool.JobQueue <- job
+
+	// trim all the space just in case (see what I did there?)
+	trimmed := strings.TrimSpace(buf.String())
+	// convert output from string to int
+	output, err := strconv.Atoi(trimmed)
+	if err != nil {
+		return -1, nil
+	}
+
+	return output, nil
 }

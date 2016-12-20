@@ -200,8 +200,8 @@ func TestParse(t *testing.T) {
 				Chef: Chef{
 					BaseRole: "baserole01",
 					RunList: []string{
-						"role01",
-						"role02",
+						"role[role01]",
+						"role[role02]",
 					},
 				},
 			},
@@ -264,8 +264,8 @@ func TestParse(t *testing.T) {
 				Chef: Chef{
 					BaseRole: "baserole01",
 					RunList: []string{
-						"role01",
-						"role02",
+						"role[role01]",
+						"role[role02]",
 					},
 				},
 			},
@@ -345,8 +345,8 @@ func TestParse(t *testing.T) {
 				Chef: Chef{
 					BaseRole: "baserole01",
 					RunList: []string{
-						"role01",
-						"role02",
+						"role[role01]",
+						"role[role02]",
 					},
 				},
 			},

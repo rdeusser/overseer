@@ -30,8 +30,8 @@ spec "default" {
     chef {
         base_role = "baserole01"
         run_list = [
-            "role01",
-            "role02"
+            "role[role01]",
+            "role[role02]"
         ]
     }
 }

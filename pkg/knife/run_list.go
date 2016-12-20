@@ -11,8 +11,9 @@ import (
 	log "github.com/iamthemuffinman/logsip"
 )
 
-func (k *Knife) AddToRunList(item string) error {
-	knife := exec.Command("knife", fmt.Sprintf("node run_list add %q %q", k.Hostname, item))
+func (k *Knife) AddToRunList() error {
+	runList := strings.Join(k.RunList, ",")
+	knife := exec.Command("knife", fmt.Sprintf("node run_list add %q %q", k.Hostname, runList))
 
 	log.Infof("Executing: %s", strings.Join(knife.Args, " "))
 

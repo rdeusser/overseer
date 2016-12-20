@@ -5,11 +5,14 @@ import (
 	"os"
 	"os/user"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/iamthemuffinman/overseer/config"
 	"github.com/iamthemuffinman/overseer/pkg/buildspec"
 	"github.com/iamthemuffinman/overseer/pkg/hammer"
 	"github.com/iamthemuffinman/overseer/pkg/hostspec"
+	"github.com/iamthemuffinman/overseer/pkg/knife"
 	"github.com/iamthemuffinman/overseer/pkg/workerpool"
 
 	"github.com/iamthemuffinman/cli"
@@ -71,7 +74,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		}
 
 		// Parse overseer's config file which contains usernames and passwords
-		conf, err := config.ParseFile(fmt.Sprintf("%s/.overseer/overseer.conf", home))
+		cspec, err := config.ParseFile(fmt.Sprintf("%s/.overseer/overseer.conf", home))
 		if err != nil {
 			log.Fatalf("unable to parse overseer config: %s", err)
 		}
@@ -82,6 +85,38 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		if err != nil {
 			log.Fatalf("unable to parse hostspec: %s", err)
 		}
+
+		hammerCmd := &hammer.Hammer{
+			Username:          cspec.Foreman.Username,
+			Password:          cspec.Foreman.Password,
+			Hostname:          "",
+			Organization:      hspec.Foreman.Organization,
+			Location:          hspec.Foreman.Location,
+			Hostgroup:         hspec.Foreman.Hostgroup,
+			Environment:       hspec.Foreman.Environment,
+			PartitionTableID:  hspec.Foreman.PartitionTableID,
+			OperatingSystemID: hspec.Foreman.OperatingSystemID,
+			Medium:            hspec.Foreman.Medium,
+			ArchitectureID:    hspec.Foreman.ArchitectureID,
+			DomainID:          hspec.Foreman.DomainID,
+			ComputeProfile:    hspec.Foreman.ComputeProfile,
+			ComputeResource:   hspec.Foreman.ComputeResource,
+			Host: hammer.Host{
+				CPUs:   hspec.Virtual.CPUs,
+				Cores:  hspec.Virtual.Cores,
+				Memory: hspec.Virtual.Memory,
+				Disks:  hspec.Vsphere.Devices.Disks,
+			},
+		}
+
+		knifeCmd := &knife.Knife{
+			Hostname:    "",
+			Environment: "",
+			BaseRole:    hspec.Chef.BaseRole,
+			RunList:     hspec.Chef.RunList,
+		}
+
+		var wg sync.WaitGroup
 
 		// If there are arguments, then the user has specified a host on the
 		// command line rather than using a buildspec
@@ -95,40 +130,60 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 				log.Fatalf("couldn't find your buildspec: %s", err)
 			}
 
-			// Same thing as above - range over all the hosts in the buildspec
+			// Range over all the hosts in the buildspec
 			for _, host := range bspec.Hosts {
-				cmd := &hammer.Hammer{
-					Username:          conf.Foreman.Username,
-					Password:          conf.Foreman.Password,
-					Hostname:          host,
-					Organization:      hspec.Foreman.Organization,
-					Location:          hspec.Foreman.Location,
-					Hostgroup:         hspec.Foreman.Hostgroup,
-					Environment:       hspec.Foreman.Environment,
-					PartitionTableID:  hspec.Foreman.PartitionTableID,
-					OperatingSystemID: hspec.Foreman.OperatingSystemID,
-					Medium:            hspec.Foreman.Medium,
-					ArchitectureID:    hspec.Foreman.ArchitectureID,
-					DomainID:          hspec.Foreman.DomainID,
-					ComputeProfile:    hspec.Foreman.ComputeProfile,
-					ComputeResource:   hspec.Foreman.ComputeResource,
-					Host: hammer.Host{
-						CPUs:   hspec.Virtual.CPUs,
-						Cores:  hspec.Virtual.Cores,
-						Memory: hspec.Virtual.Memory,
-						Disks:  hspec.Vsphere.Devices.Disks,
-					},
-				}
-
+				hammerCmd.Hostname = host
 				// Execute is a method that will send the command to a job queue
 				// to be processed by a goroutine. This way we can build more
 				// hosts at the same time by executing hammer in parallel.
-				if err := cmd.Execute(); err != nil {
+				if err := hammerCmd.Execute(); err != nil {
 					log.Fatalf("error executing hammer: %s", err)
 				}
 
-				// Run chef/knife stuff here
+				wg.Add(1)
+				go func(host string) {
+					defer wg.Done()
+					for {
+						// GetBuildStatus will return 0 if Foreman says the host has been
+						// build successfully. We'll wait until all hosts have been built
+						// sucessfully and then we'll execute knife.
+						status, err := hammerCmd.GetBuildStatus()
+						if err != nil {
+							log.Fatalf("error executing hammer: %s", err)
+						}
+
+						if status == 0 {
+							log.Infof("%s built successfully!", host)
+						} else {
+							time.Sleep(1 * time.Minute)
+						}
+					}
+				}(hammerCmd.Hostname)
 			}
+
+			wg.Wait()
+
+			for _, host := range bspec.Hosts {
+				knifeCmd.Hostname = host
+
+				wg.Add(1)
+				go func(host string) {
+					defer wg.Done()
+					// Bootstrap each host with the base role
+					if err := knifeCmd.Bootstrap(); err != nil {
+						log.Fatalf("error executing knife: %s", err)
+					}
+					// Add all recipes/cookbooks/roles to the run list
+					// of each node
+					if err := knifeCmd.AddToRunList(); err != nil {
+						log.Fatalf("error executing knife: %s", err)
+					}
+				}(hammerCmd.Hostname)
+			}
+
+			wg.Wait()
+
+			log.Info("All hosts successfully created and chef'd!")
 		}
 	}()
 

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestNewHost(t *testing.T) {
+func TestNewClient(t *testing.T) {
 	cases := []struct {
 		File       string
 		ChefServer string
@@ -43,5 +43,7 @@ func TestNewHost(t *testing.T) {
 		}
 	}
 }
+
+func TestNewHost(t *testing.T) {}
 
 func TestReadValidationKey(t *testing.T) {}

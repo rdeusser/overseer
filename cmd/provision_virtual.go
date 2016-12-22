@@ -112,7 +112,6 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		knifeCmd := &knife.Knife{
 			Hostname:    "",
 			Environment: hspec.Chef.Environment,
-			BaseRole:    hspec.Chef.BaseRole,
 			RunList:     hspec.Chef.RunList,
 		}
 
@@ -154,6 +153,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 
 						if status == 0 {
 							log.Infof("%s built successfully!", host)
+							break
 						} else {
 							time.Sleep(1 * time.Minute)
 						}
@@ -169,10 +169,6 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 				wg.Add(1)
 				go func(host string) {
 					defer wg.Done()
-					// Bootstrap each host with the base role
-					if err := knifeCmd.Bootstrap(); err != nil {
-						log.Fatalf("error executing knife: %s", err)
-					}
 					// Add all recipes/cookbooks/roles to the run list
 					// of each node
 					if err := knifeCmd.AddToRunList(); err != nil {

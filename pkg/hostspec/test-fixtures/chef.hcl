@@ -28,8 +28,9 @@ spec "default" {
     }
 
     chef {
+        server = "https://chef.qa.local"
+        validation_key = "~/.chef/validation_key.pem"
         environment = "qa"
-        base_role = "baserole01"
         run_list = [
             "role[role01]",
             "role[role02]"

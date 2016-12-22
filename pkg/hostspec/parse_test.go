@@ -198,8 +198,9 @@ func TestParse(t *testing.T) {
 					},
 				},
 				Chef: Chef{
-					Environment: "qa",
-					BaseRole:    "baserole01",
+					Server:        "https://chef.qa.local",
+					ValidationKey: "~/.chef/validation_key.pem",
+					Environment:   "qa",
 					RunList: []string{
 						"role[role01]",
 						"role[role02]",
@@ -263,8 +264,9 @@ func TestParse(t *testing.T) {
 					Medium:            "centos-7",
 				},
 				Chef: Chef{
-					Environment: "qa",
-					BaseRole:    "baserole01",
+					Server:        "https://chef.qa.local",
+					ValidationKey: "~/.chef/validation_key.pem",
+					Environment:   "qa",
 					RunList: []string{
 						"role[role01]",
 						"role[role02]",
@@ -345,8 +347,9 @@ func TestParse(t *testing.T) {
 					Medium:            "centos-7",
 				},
 				Chef: Chef{
-					Environment: "qa",
-					BaseRole:    "baserole01",
+					Server:        "https://chef.qa.local",
+					ValidationKey: "~/.chef/validation_key.pem",
+					Environment:   "qa",
 					RunList: []string{
 						"role[role01]",
 						"role[role02]",

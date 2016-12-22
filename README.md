@@ -55,7 +55,6 @@ spec "indy.prod.kafka" {
     }
 
     chef {
-        base_role = "baserole01"
         run_list = [
             "role[role01]",
             "role[role02]"

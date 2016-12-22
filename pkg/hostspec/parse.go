@@ -43,9 +43,10 @@ type Foreman struct {
 }
 
 type Chef struct {
-	Environment string   `mapstructure:"environment"`
-	BaseRole    string   `mapstructure:"base_role"`
-	RunList     []string `mapstructure:"run_list"`
+	Server        string   `mapstructure:"server"`
+	ValidationKey string   `mapstructure:"validation_key"`
+	Environment   string   `mapstructure:"environment"`
+	RunList       []string `mapstructure:"run_list"`
 }
 
 type Vsphere struct {
@@ -291,8 +292,9 @@ func parseChef(result *Chef, list *ast.ObjectList) error {
 	o := list.Items[0]
 
 	valid := []string{
+		"server",
+		"validation_key",
 		"environment",
-		"base_role",
 		"run_list",
 	}
 	if err := checkHCLKeys(o.Val, valid); err != nil {

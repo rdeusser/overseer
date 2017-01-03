@@ -25,7 +25,7 @@ func helpMain(commands map[string]cli.CommandFactory) string {
 	helpText := fmt.Sprintf(`
 Usage: overseer [--version] [--help] <command> [args]
 
-overseer is an automation tool for provisioning of physcial and virtual servers.
+overseer is an automation tool for provisioning of physical and virtual servers.
 It will grow to encompass much more.
 
 Commands:

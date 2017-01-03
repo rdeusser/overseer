@@ -145,7 +145,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 					for {
 						// GetBuildStatus will return 0 if Foreman says the host has been
 						// build successfully. We'll wait until all hosts have been built
-						// sucessfully and then we'll execute knife.
+						// successfully and then we'll execute hammer.
 						status, err := hammerCmd.GetBuildStatus()
 						if err != nil {
 							log.Fatalf("error executing hammer: %s", err)

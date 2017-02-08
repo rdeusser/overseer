@@ -9,9 +9,9 @@ import (
 
 	"github.com/iamthemuffinman/overseer/configspec"
 	"github.com/iamthemuffinman/overseer/pkg/buildspec"
+	"github.com/iamthemuffinman/overseer/pkg/chef"
 	"github.com/iamthemuffinman/overseer/pkg/hammer"
 	"github.com/iamthemuffinman/overseer/pkg/hostspec"
-	"github.com/iamthemuffinman/overseer/pkg/knife"
 	"github.com/iamthemuffinman/overseer/pkg/workerpool"
 
 	"github.com/iamthemuffinman/cli"
@@ -65,9 +65,8 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 
 		bspec, hspec, cspec := loadSpecs(home, *specfile)
 
-		// Doing things via hammer and knife are only temporary so I feel comfortable doing this
+		// temporary
 		hammerCmd := hammer.New(bspec, cspec)
-		knifeCmd := knife.New(bspec)
 
 		// If there are arguments, then the user has specified a host on the
 		// command line rather than using a hostspec
@@ -105,12 +104,10 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		}
 
 		for _, host := range hspec.Hosts {
-			knifeCmd.Hostname = host
-
 			// Add all recipes/cookbooks/roles to the run list
 			// of each node
-			if err := knifeCmd.AddToRunList(); err != nil {
-				log.Fatalf("error executing knife: %s", err)
+			if err := chef.UpdateNode(host, cspec.Chef.ClientKey, cspec.Chef.ChefServer, bspec.Chef.RunList); err != nil {
+				log.Warnf("unable to update chef node: %s", err)
 			}
 		}
 

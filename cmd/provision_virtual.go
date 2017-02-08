@@ -63,18 +63,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 			log.Fatalf("unable to retrieve users home directory: %s", err)
 		}
 
-		// Parse overseer's configspec file which contains usernames and passwords
-		cspec, err := configspec.ParseFile(fmt.Sprintf("%s/.overseer/overseer.conf", home))
-		if err != nil {
-			log.Fatalf("unable to parse overseer configspec: %s", err)
-		}
-
-		// Here is where we essentially parse the entire buildspecs directory to find
-		// the buildspec specified on the command line.
-		bspec, err := buildspec.ParseDir("/etc/overseer/buildspecs", *specfile)
-		if err != nil {
-			log.Fatalf("unable to parse buildspec: %s", err)
-		}
+		bspec, hspec, cspec := loadSpecs(home, *specfile)
 
 		// Doing things via hammer and knife are only temporary so I feel comfortable doing this
 		hammerCmd := hammer.New(bspec, cspec)
@@ -85,12 +74,6 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		if len(c.FlagSet.Args()) > 0 {
 			log.Errorf("Please use a hostspec instead of specifying hosts on the command line")
 			os.Exit(1)
-		}
-
-		// Parse the hostspec in the current directory to get a list of hosts
-		hspec, err := hostspec.ParseFile("./hostspec")
-		if err != nil {
-			log.Fatalf("couldn't find your hostspec: %s", err)
 		}
 
 		// Range over all the hosts in the hostspec
@@ -169,6 +152,31 @@ func getHomeDir() (string, error) {
 		return currentUser.HomeDir, nil
 	}
 	return home, nil
+}
+
+// No need to return an error here. We can keep it local because if there are any issues
+// whatsoever with any of these we need to bail out ASAP.
+func loadSpecs(home, specfile string) (*buildspec.Spec, *hostspec.Spec, *configspec.Spec) {
+	// Parse overseer's configspec file which contains usernames and passwords
+	cspec, err := configspec.ParseFile(fmt.Sprintf("%s/.overseer/overseer.conf", home))
+	if err != nil {
+		log.Fatalf("unable to parse overseer configspec: %s", err)
+	}
+
+	// Here is where we essentially parse the entire buildspecs directory to find
+	// the buildspec specified on the command line.
+	bspec, err := buildspec.ParseDir("/etc/overseer/buildspecs", specfile)
+	if err != nil {
+		log.Fatalf("unable to parse buildspec: %s", err)
+	}
+
+	// Parse the hostspec in the current directory to get a list of hosts
+	hspec, err := hostspec.ParseFile("./hostspec")
+	if err != nil {
+		log.Fatalf("couldn't find your hostspec: %s", err)
+	}
+
+	return bspec, hspec, cspec
 }
 
 func (c *ProvisionVirtualCommand) Help() string {

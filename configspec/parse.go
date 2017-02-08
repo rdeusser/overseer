@@ -15,7 +15,7 @@ import (
 
 type Spec struct {
 	Foreman  Foreman  `mapstructure:"foreman"`
-	Knife    Knife    `mapstructure:"knife"`
+	Chef     Chef     `mapstructure:"chef"`
 	Vsphere  Vsphere  `mapstructure:"vsphere"`
 	Infoblox Infoblox `mapstructure:"infoblox"`
 }
@@ -25,7 +25,7 @@ type Foreman struct {
 	Password string `mapstructure:"password"`
 }
 
-type Knife struct {
+type Chef struct {
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 }
@@ -81,7 +81,7 @@ func Parse(r io.Reader) (*Spec, error) {
 	// Check for invalid keys
 	valid := []string{
 		"foreman",
-		"knife",
+		"chef",
 		"vsphere",
 		"infoblox",
 	}
@@ -96,9 +96,9 @@ func Parse(r io.Reader) (*Spec, error) {
 			return nil, fmt.Errorf("error parsing foreman block: %s", err)
 		}
 	}
-	if o := list.Filter("knife"); len(o.Items) > 0 {
-		if err := parseKnife(&spec.Knife, o); err != nil {
-			return nil, fmt.Errorf("error parsing knife block: %s", err)
+	if o := list.Filter("chef"); len(o.Items) > 0 {
+		if err := parseChef(&spec.Chef, o); err != nil {
+			return nil, fmt.Errorf("error parsing chef block: %s", err)
 		}
 	}
 	if o := list.Filter("vsphere"); len(o.Items) > 0 {
@@ -146,13 +146,13 @@ func parseForeman(result *Foreman, list *ast.ObjectList) error {
 	return nil
 }
 
-func parseKnife(result *Knife, list *ast.ObjectList) error {
+func parseChef(result *Chef, list *ast.ObjectList) error {
 	list = list.Elem()
 	if len(list.Items) > 1 {
-		return fmt.Errorf("Only one %q block allowed", "knife")
+		return fmt.Errorf("Only one %q block allowed", "chef")
 	}
 
-	// Get our "knife" object
+	// Get our "chef" object
 	o := list.Items[0]
 
 	valid := []string{
@@ -168,12 +168,12 @@ func parseKnife(result *Knife, list *ast.ObjectList) error {
 		return err
 	}
 
-	var knife Knife
-	if err := mapstructure.WeakDecode(m, &knife); err != nil {
+	var chef Chef
+	if err := mapstructure.WeakDecode(m, &chef); err != nil {
 		return err
 	}
 
-	*result = knife
+	*result = chef
 	return nil
 }
 

@@ -13,7 +13,7 @@ var PlumbingCommands map[string]struct{}
 var UI cli.Ui
 
 func init() {
-	UI = &cli.BasicUI{
+	UI = &cli.BasicUi{
 		Reader:      os.Stdin,
 		Writer:      os.Stdout,
 		ErrorWriter: os.Stderr,

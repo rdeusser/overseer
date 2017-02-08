@@ -7,13 +7,13 @@ import (
 )
 
 type VersionCommand struct {
-	Ui       cli.Ui
+	UI       cli.Ui
 	Revision string
 	Version  string
 }
 
 func (c *VersionCommand) Run(args []string) int {
-	c.Ui.Output(fmt.Sprintf("%s (%s)", c.Version, c.Revision))
+	c.UI.Output(fmt.Sprintf("%s (%s)", c.Version, c.Revision))
 	return 0
 }
 

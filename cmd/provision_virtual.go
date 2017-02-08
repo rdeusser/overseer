@@ -22,7 +22,7 @@ import (
 )
 
 type ProvisionVirtualCommand struct {
-	Ui         cli.Ui
+	UI         cli.Ui
 	FlagSet    *flag.FlagSet
 	ShutdownCh <-chan struct{}
 }

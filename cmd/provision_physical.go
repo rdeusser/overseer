@@ -7,7 +7,7 @@ import (
 )
 
 type ProvisionPhysicalCommand struct {
-	Ui         cli.Ui
+	UI         cli.Ui
 	ShutdownCh <-chan struct{}
 }
 
@@ -30,11 +30,11 @@ func (c *ProvisionPhysicalCommand) Run(args []string) int {
 
 	select {
 	case <-c.ShutdownCh:
-		c.Ui.Output("Interrupt received. Gracefully shutting down...")
+		c.UI.Output("Interrupt received. Gracefully shutting down...")
 
 		select {
 		case <-c.ShutdownCh:
-			c.Ui.Error("Two interrupts received. Exiting immediately. Data loss may have occurred.")
+			c.UI.Error("Two interrupts received. Exiting immediately. Data loss may have occurred.")
 			return 1
 		case <-doneCh:
 		}

@@ -13,7 +13,7 @@ import (
 )
 
 type InitCommand struct {
-	Ui         cli.Ui
+	UI         cli.Ui
 	ShutdownCh <-chan struct{}
 }
 

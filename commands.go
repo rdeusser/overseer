@@ -10,10 +10,10 @@ import (
 
 var Commands map[string]cli.CommandFactory
 var PlumbingCommands map[string]struct{}
-var Ui cli.Ui
+var UI cli.Ui
 
 func init() {
-	Ui = &cli.BasicUi{
+	UI = &cli.BasicUI{
 		Reader:      os.Stdin,
 		Writer:      os.Stdout,
 		ErrorWriter: os.Stderr,
@@ -26,13 +26,13 @@ func init() {
 	Commands = map[string]cli.CommandFactory{
 		"init": func() (cli.Command, error) {
 			return &cmd.InitCommand{
-				Ui: Ui,
+				UI: UI,
 			}, nil
 		},
 
 		"version": func() (cli.Command, error) {
 			return &cmd.VersionCommand{
-				Ui:       Ui,
+				UI:       UI,
 				Revision: GitCommit,
 				Version:  Version,
 			}, nil
@@ -40,20 +40,20 @@ func init() {
 
 		"provision": func() (cli.Command, error) {
 			return &cmd.ProvisionCommand{
-				Ui: Ui,
+				UI: UI,
 			}, nil
 		},
 
 		"provision virtual": func() (cli.Command, error) {
 			return &cmd.ProvisionVirtualCommand{
-				Ui:         Ui,
+				UI:         UI,
 				ShutdownCh: makeShutdownCh(),
 			}, nil
 		},
 
 		"provision physical": func() (cli.Command, error) {
 			return &cmd.ProvisionPhysicalCommand{
-				Ui:         Ui,
+				UI:         UI,
 				ShutdownCh: makeShutdownCh(),
 			}, nil
 		},

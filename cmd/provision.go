@@ -7,7 +7,7 @@ import (
 )
 
 type ProvisionCommand struct {
-	Ui cli.Ui
+	UI cli.Ui
 }
 
 func (c *ProvisionCommand) Run(args []string) int {

@@ -59,18 +59,9 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 			log.Fatal("You must specify a buildspec")
 		}
 
-		// Get user's home directory so we can pass it to the config parser
-		home, err := homedir.Dir()
+		home, err := getHomeDir()
 		if err != nil {
-			// If for some reason the above doesn't work, let's see what the standard library
-			// can do for us here. If this doesn't work, something is wrong and we should
-			// cut out at this point.
-			currentUser, err := user.Current()
-			if err != nil {
-				log.Fatalf("unable to get the home directory of the user running this process")
-			}
-
-			home = currentUser.HomeDir
+			log.Fatalf("unable to retrieve users home directory: %s", err)
 		}
 
 		// Parse overseer's config file which contains usernames and passwords
@@ -201,6 +192,23 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 	}
 
 	return 0
+}
+
+// Get user's home directory so we can pass it to the config parser
+func getHomeDir() (string, error) {
+	home, err := homedir.Dir()
+	if err != nil {
+		// If for some reason the above doesn't work, let's see what the standard library
+		// can do for us here. If this doesn't work, something is wrong and we should
+		// cut out at this point.
+		currentUser, err := user.Current()
+		if err != nil {
+			return "", err
+		}
+
+		return currentUser.HomeDir, nil
+	}
+	return home, nil
 }
 
 func (c *ProvisionVirtualCommand) Help() string {

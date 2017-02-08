@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/user"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/iamthemuffinman/overseer/configspec"
@@ -77,101 +76,62 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 			log.Fatalf("unable to parse buildspec: %s", err)
 		}
 
-		hammerCmd := &hammer.Hammer{
-			Username:          cspec.Foreman.Username,
-			Password:          cspec.Foreman.Password,
-			Hostname:          "",
-			Organization:      bspec.Foreman.Organization,
-			Location:          bspec.Foreman.Location,
-			Hostgroup:         bspec.Foreman.Hostgroup,
-			Environment:       bspec.Foreman.Environment,
-			PartitionTableID:  bspec.Foreman.PartitionTableID,
-			OperatingSystemID: bspec.Foreman.OperatingSystemID,
-			Medium:            bspec.Foreman.Medium,
-			ArchitectureID:    bspec.Foreman.ArchitectureID,
-			DomainID:          bspec.Foreman.DomainID,
-			ComputeProfile:    bspec.Foreman.ComputeProfile,
-			ComputeResource:   bspec.Foreman.ComputeResource,
-			Host: hammer.Host{
-				CPUs:   bspec.Virtual.CPUs,
-				Cores:  bspec.Virtual.Cores,
-				Memory: bspec.Virtual.Memory,
-				Disks:  bspec.Vsphere.Devices.Disks,
-			},
-		}
-
-		knifeCmd := &knife.Knife{
-			Hostname:    "",
-			Environment: bspec.Chef.Environment,
-			RunList:     bspec.Chef.RunList,
-		}
-
-		var wg sync.WaitGroup
+		// Doing things via hammer and knife are only temporary so I feel comfortable doing this
+		hammerCmd := hammer.New(bspec, cspec)
+		knifeCmd := knife.New(bspec)
 
 		// If there are arguments, then the user has specified a host on the
 		// command line rather than using a hostspec
 		if len(c.FlagSet.Args()) > 0 {
 			log.Errorf("Please use a hostspec instead of specifying hosts on the command line")
 			os.Exit(1)
-		} else {
-			// Parse the hostspec in the current directory to get a list of hosts
-			hspec, err := hostspec.ParseFile("./hostspec")
-			if err != nil {
-				log.Fatalf("couldn't find your hostspec: %s", err)
+		}
+
+		// Parse the hostspec in the current directory to get a list of hosts
+		hspec, err := hostspec.ParseFile("./hostspec")
+		if err != nil {
+			log.Fatalf("couldn't find your hostspec: %s", err)
+		}
+
+		// Range over all the hosts in the hostspec
+		for _, host := range hspec.Hosts {
+			hammerCmd.Hostname = host
+			// Execute is a method that will send the command to a job queue
+			// to be processed by a goroutine. This way we can build more
+			// hosts at the same time by executing hammer in parallel.
+			if err := hammerCmd.Execute(); err != nil {
+				log.Fatalf("error executing hammer: %s", err)
 			}
 
-			// Range over all the hosts in the hostspec
-			for _, host := range hspec.Hosts {
-				hammerCmd.Hostname = host
-				// Execute is a method that will send the command to a job queue
-				// to be processed by a goroutine. This way we can build more
-				// hosts at the same time by executing hammer in parallel.
-				if err := hammerCmd.Execute(); err != nil {
+			for {
+				// GetBuildStatus will return 0 if Foreman says the host has been
+				// build successfully. We'll wait until all hosts have been built
+				// successfully and then we'll execute hammer.
+				status, err := hammerCmd.GetBuildStatus()
+				if err != nil {
 					log.Fatalf("error executing hammer: %s", err)
 				}
 
-				wg.Add(1)
-				go func(host string) {
-					defer wg.Done()
-					for {
-						// GetBuildStatus will return 0 if Foreman says the host has been
-						// build successfully. We'll wait until all hosts have been built
-						// successfully and then we'll execute hammer.
-						status, err := hammerCmd.GetBuildStatus()
-						if err != nil {
-							log.Fatalf("error executing hammer: %s", err)
-						}
-
-						if status == 0 {
-							log.Infof("%s built successfully!", host)
-							break
-						} else {
-							time.Sleep(1 * time.Minute)
-						}
-					}
-				}(hammerCmd.Hostname)
+				if status == 0 {
+					log.Infof("%s built successfully!", host)
+					break
+				} else {
+					time.Sleep(1 * time.Minute)
+				}
 			}
-
-			wg.Wait()
-
-			for _, host := range hspec.Hosts {
-				knifeCmd.Hostname = host
-
-				wg.Add(1)
-				go func(host string) {
-					defer wg.Done()
-					// Add all recipes/cookbooks/roles to the run list
-					// of each node
-					if err := knifeCmd.AddToRunList(); err != nil {
-						log.Fatalf("error executing knife: %s", err)
-					}
-				}(hammerCmd.Hostname)
-			}
-
-			wg.Wait()
-
-			log.Info("All hosts successfully created and chef'd!")
 		}
+
+		for _, host := range hspec.Hosts {
+			knifeCmd.Hostname = host
+
+			// Add all recipes/cookbooks/roles to the run list
+			// of each node
+			if err := knifeCmd.AddToRunList(); err != nil {
+				log.Fatalf("error executing knife: %s", err)
+			}
+		}
+
+		log.Info("All hosts successfully created and chef'd!")
 	}()
 
 	select {

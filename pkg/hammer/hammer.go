@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/iamthemuffinman/overseer/configspec"
 	"github.com/iamthemuffinman/overseer/pkg/buildspec"
 	"github.com/iamthemuffinman/overseer/pkg/workerpool"
 
@@ -40,6 +41,31 @@ type Host struct {
 	Cores  int
 	Memory int
 	Disks  []*buildspec.Disk
+}
+
+func New(bspec *buildspec.Spec, cspec *configspec.Spec) *Hammer {
+	return &Hammer{
+		Username:          cspec.Foreman.Username,
+		Password:          cspec.Foreman.Password,
+		Hostname:          "",
+		Organization:      bspec.Foreman.Organization,
+		Location:          bspec.Foreman.Location,
+		Hostgroup:         bspec.Foreman.Hostgroup,
+		Environment:       bspec.Foreman.Environment,
+		PartitionTableID:  bspec.Foreman.PartitionTableID,
+		OperatingSystemID: bspec.Foreman.OperatingSystemID,
+		Medium:            bspec.Foreman.Medium,
+		ArchitectureID:    bspec.Foreman.ArchitectureID,
+		DomainID:          bspec.Foreman.DomainID,
+		ComputeProfile:    bspec.Foreman.ComputeProfile,
+		ComputeResource:   bspec.Foreman.ComputeResource,
+		Host: Host{
+			CPUs:   bspec.Virtual.CPUs,
+			Cores:  bspec.Virtual.Cores,
+			Memory: bspec.Virtual.Memory,
+			Disks:  bspec.Vsphere.Devices.Disks,
+		},
+	}
 }
 
 func (h *Hammer) joinVolumes() string {

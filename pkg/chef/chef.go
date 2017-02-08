@@ -2,11 +2,13 @@ package chef
 
 import (
 	"io/ioutil"
-	"strings"
 
 	"github.com/go-chef/chef"
-	"github.com/mitchellh/go-homedir"
+	"github.com/iamthemuffinman/overseer/pkg/util"
 )
+
+type Chef struct {
+}
 
 func NewClient(key, chefServer string) (*chef.Client, error) {
 	client, err := chef.NewClient(&chef.Config{
@@ -21,36 +23,42 @@ func NewClient(key, chefServer string) (*chef.Client, error) {
 	return client, nil
 }
 
-func NewHost(name, env string, runList []string) *chef.Node {
-	return &chef.Node{
-		Name:        name,
-		Environment: env,
-		ChefType:    "node",
-		JsonClass:   "Chef::Node",
-		RunList:     runList,
-	}
+func AddToRunList(name, runListItem string) chef.Node {
+	node := chef.NewNode(name)
+	node.RunList = append(node.RunList, runListItem)
+	return node
 }
 
-func ReadValidationKey(validationKey string) (string, error) {
-	if validationKey[:1] != "~" {
-		key, err := ioutil.ReadFile(validationKey)
-		if err != nil {
-			return "", err
-		}
-
-		return string(key), nil
-	}
-
-	home, err := homedir.Dir()
+func ReadKey(keyPath string) (string, error) {
+	path, err := util.ExpandPath(keyPath)
 	if err != nil {
 		return "", err
 	}
-	expandedKeyPath := strings.Replace(validationKey, "~", home, 1)
 
-	key, err := ioutil.ReadFile(expandedKeyPath)
+	key, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
 
 	return string(key), nil
+}
+
+func UpdateNode(name, keyPath, chefServer string, runList []string) error {
+	key, err := ReadKey(keyPath)
+	if err != nil {
+		return err
+	}
+
+	client, err := NewClient(key, chefServer)
+	if err != nil {
+		return err
+	}
+
+	var node chef.Node
+	for _, item := range runList {
+		node = AddToRunList(name, item)
+	}
+
+	client.Nodes.Put(node)
+	return nil
 }

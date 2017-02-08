@@ -44,6 +44,6 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func TestNewHost(t *testing.T) {}
+func TestAddToRunList(t *testing.T) {}
 
 func TestReadValidationKey(t *testing.T) {}

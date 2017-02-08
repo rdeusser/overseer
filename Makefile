@@ -8,6 +8,7 @@ fmt:
 	go fmt `go list ./...`
 
 deps:
+	go get -u github.com/golang/lint/golint
 	go get -t -v ./...
 
 test: deps

@@ -116,7 +116,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 					log.Infof("%s built successfully!", host)
 					break
 				} else {
-					time.Sleep(1 * time.Minute)
+					time.Sleep(30 * time.Second)
 				}
 			}
 		}

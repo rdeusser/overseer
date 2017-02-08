@@ -26,8 +26,11 @@ type Foreman struct {
 }
 
 type Chef struct {
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
+	Username      string `mapstructure:"username"`
+	Password      string `mapstructure:"password"`
+	ChefServer    string `mapstructure:"chef_server"`
+	ClientKey     string `mapstructure:"client_key"`
+	ValidationKey string `mapstructure:"validation_key"`
 }
 
 type Vsphere struct {
@@ -158,6 +161,9 @@ func parseChef(result *Chef, list *ast.ObjectList) error {
 	valid := []string{
 		"username",
 		"password",
+		"chef_server",
+		"client_key",
+		"validation_key",
 	}
 	if err := checkHCLKeys(o.Val, valid); err != nil {
 		return err

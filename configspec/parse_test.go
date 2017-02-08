@@ -19,9 +19,12 @@ func TestParse(t *testing.T) {
 					Username: "admin",
 					Password: "datpass",
 				},
-				Knife: Knife{
-					Username: "admin",
-					Password: "datpass",
+				Chef: Chef{
+					Username:      "admin",
+					Password:      "datpass",
+					ChefServer:    "https://localhost/",
+					ClientKey:     "~/.chef/client.pem",
+					ValidationKey: "~/.chef/validation.pem",
 				},
 				Vsphere: Vsphere{
 					Username: "admin",

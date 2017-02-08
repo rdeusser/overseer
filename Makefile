@@ -12,8 +12,8 @@ deps:
 
 test: deps
 	go tool vet .
-	go test -v -race ./...
 	golint ./...
+	go test -v -race ./...
 
 prod: fmt deps test
 	@M_PROD=1 BIN_VERSION=$(VERSION) sh -c "'$(CURDIR)/scripts/build.sh'"

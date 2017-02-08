@@ -49,14 +49,14 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 		defer close(doneCh)
 		c.FlagSet = flag.NewFlagSet("virtual", flag.ExitOnError)
 
-		specfile := c.FlagSet.StringP("hostspec", "h", "", "Provide a specfile name for your host(s) (i.e. indy.prod.kafka)")
+		specfile := c.FlagSet.StringP("buildspec", "h", "", "Provide a buildspec for your host(s) (i.e. indy.prod.kafka)")
 
 		// Parse everything after 3 arguments (i.e overseer provision virtual STARTHERE)
 		c.FlagSet.Parse(os.Args[3:])
 
-		// GTFO if a hostspec wasn't specified
+		// GTFO if a buildspec wasn't specified
 		if *specfile == "" {
-			log.Fatal("You must specify a hostspec")
+			log.Fatal("You must specify a buildspec")
 		}
 
 		// Get user's home directory so we can pass it to the config parser
@@ -79,58 +79,58 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 			log.Fatalf("unable to parse overseer config: %s", err)
 		}
 
-		// Here is where we essentially parse the entire hostspecs directory to find
-		// the hostspec specified on the command line.
-		hspec, err := hostspec.ParseDir("/etc/overseer/hostspecs", *specfile)
+		// Here is where we essentially parse the entire buildspecs directory to find
+		// the buildspec specified on the command line.
+		bspec, err := buildspec.ParseDir("/etc/overseer/buildspecs", *specfile)
 		if err != nil {
-			log.Fatalf("unable to parse hostspec: %s", err)
+			log.Fatalf("unable to parse buildspec: %s", err)
 		}
 
 		hammerCmd := &hammer.Hammer{
 			Username:          cspec.Foreman.Username,
 			Password:          cspec.Foreman.Password,
 			Hostname:          "",
-			Organization:      hspec.Foreman.Organization,
-			Location:          hspec.Foreman.Location,
-			Hostgroup:         hspec.Foreman.Hostgroup,
-			Environment:       hspec.Foreman.Environment,
-			PartitionTableID:  hspec.Foreman.PartitionTableID,
-			OperatingSystemID: hspec.Foreman.OperatingSystemID,
-			Medium:            hspec.Foreman.Medium,
-			ArchitectureID:    hspec.Foreman.ArchitectureID,
-			DomainID:          hspec.Foreman.DomainID,
-			ComputeProfile:    hspec.Foreman.ComputeProfile,
-			ComputeResource:   hspec.Foreman.ComputeResource,
+			Organization:      bspec.Foreman.Organization,
+			Location:          bspec.Foreman.Location,
+			Hostgroup:         bspec.Foreman.Hostgroup,
+			Environment:       bspec.Foreman.Environment,
+			PartitionTableID:  bspec.Foreman.PartitionTableID,
+			OperatingSystemID: bspec.Foreman.OperatingSystemID,
+			Medium:            bspec.Foreman.Medium,
+			ArchitectureID:    bspec.Foreman.ArchitectureID,
+			DomainID:          bspec.Foreman.DomainID,
+			ComputeProfile:    bspec.Foreman.ComputeProfile,
+			ComputeResource:   bspec.Foreman.ComputeResource,
 			Host: hammer.Host{
-				CPUs:   hspec.Virtual.CPUs,
-				Cores:  hspec.Virtual.Cores,
-				Memory: hspec.Virtual.Memory,
-				Disks:  hspec.Vsphere.Devices.Disks,
+				CPUs:   bspec.Virtual.CPUs,
+				Cores:  bspec.Virtual.Cores,
+				Memory: bspec.Virtual.Memory,
+				Disks:  bspec.Vsphere.Devices.Disks,
 			},
 		}
 
 		knifeCmd := &knife.Knife{
 			Hostname:    "",
-			Environment: hspec.Chef.Environment,
-			RunList:     hspec.Chef.RunList,
+			Environment: bspec.Chef.Environment,
+			RunList:     bspec.Chef.RunList,
 		}
 
 		var wg sync.WaitGroup
 
 		// If there are arguments, then the user has specified a host on the
-		// command line rather than using a buildspec
+		// command line rather than using a hostspec
 		if len(c.FlagSet.Args()) > 0 {
-			log.Errorf("Please use a buildspec instead of specifying hosts on the command line")
+			log.Errorf("Please use a hostspec instead of specifying hosts on the command line")
 			os.Exit(1)
 		} else {
-			// Parse the buildspec in the current directory to get a list of hosts
-			bspec, err := buildspec.ParseFile("./buildspec")
+			// Parse the hostspec in the current directory to get a list of hosts
+			hspec, err := hostspec.ParseFile("./hostspec")
 			if err != nil {
-				log.Fatalf("couldn't find your buildspec: %s", err)
+				log.Fatalf("couldn't find your hostspec: %s", err)
 			}
 
-			// Range over all the hosts in the buildspec
-			for _, host := range bspec.Hosts {
+			// Range over all the hosts in the hostspec
+			for _, host := range hspec.Hosts {
 				hammerCmd.Hostname = host
 				// Execute is a method that will send the command to a job queue
 				// to be processed by a goroutine. This way we can build more
@@ -163,7 +163,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 
 			wg.Wait()
 
-			for _, host := range bspec.Hosts {
+			for _, host := range hspec.Hosts {
 				knifeCmd.Hostname = host
 
 				wg.Add(1)

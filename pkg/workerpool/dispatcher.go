@@ -4,7 +4,7 @@ import (
 	"runtime"
 )
 
-var maxWorkers = runtime.GOMAXPROCS(runtime.NumCPU())
+var maxWorkers = runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 
 type Dispatcher struct {
 	// A pool of worker channels.

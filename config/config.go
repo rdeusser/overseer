@@ -40,7 +40,7 @@ type Infoblox struct {
 	Password string `mapstructure:"password"`
 }
 
-// ParseFile parses the given hostspec file.
+// ParseFile parses the given configspec file.
 func ParseFile(path string) (*Spec, error) {
 	path, err := filepath.Abs(path)
 	if err != nil {
@@ -56,8 +56,6 @@ func ParseFile(path string) (*Spec, error) {
 	return Parse(f)
 }
 
-// Parse parses the hostspec from the given io.Reader.
-//
 // Due to current internal limitations, the entire contents of the
 // io.Reader will be copied into memory first before parsing.
 func Parse(r io.Reader) (*Spec, error) {

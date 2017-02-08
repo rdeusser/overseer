@@ -24,8 +24,8 @@ func (c *ProvisionPhysicalCommand) Run(args []string) int {
 
 	doneCh := make(chan struct{})
 	go func() {
-		// actual work goes here
 		defer close(doneCh)
+		// do stuff here
 	}()
 
 	select {

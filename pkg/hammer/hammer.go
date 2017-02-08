@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/iamthemuffinman/overseer/pkg/hostspec"
+	"github.com/iamthemuffinman/overseer/pkg/buildspec"
 	"github.com/iamthemuffinman/overseer/pkg/workerpool"
 
 	log "github.com/iamthemuffinman/logsip"
@@ -39,7 +39,7 @@ type Host struct {
 	CPUs   int
 	Cores  int
 	Memory int
-	Disks  []*hostspec.Disk
+	Disks  []*buildspec.Disk
 }
 
 func (h *Hammer) joinVolumes() string {

@@ -13,360 +13,43 @@ func TestParse(t *testing.T) {
 		Err      bool
 	}{
 		{
-			"basic.hcl",
+			"virtualspec",
 			&Spec{
-				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
+				Hosts: []string{
+					"hello.qa.local",
+					"lol.qa.local",
+					"with1234.qa.local",
+					"nope.qa.local",
+					"sometimes@#$@#%123135.qa.local",
 				},
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
-					Devices: Devices{
-						Disks: []*Disk{
-							{
-								DeviceName: "Hard disk 1",
-								DeviceType: "disk",
-								Size:       40,
-							},
-						},
-						Networks: []*Network{
-							{
-								DeviceName: "Network adapter 1",
-								DeviceType: "network",
-								BuildVLAN:  "dv-build",
-								VLAN:       "dv-appservers",
-								SwitchType: "distributed",
-							},
-						},
-						SCSIs: []*SCSI{
-							{
-								DeviceName: "SCSI controller 1",
-								DeviceType: "scsi",
-								Type:       "paravirtual",
-							},
-						},
-					},
-				},
+				MACs: nil,
 			},
 			false,
 		},
 		{
-			"bad-no-name.hcl",
-			nil,
-			true,
-		},
-		{
-			"bad-devices.hcl",
+			"physicalspec",
 			&Spec{
-				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
+				Hosts: []string{
+					"hello.qa.local",
+					"lol.qa.local",
+					"with1234.qa.local",
+					"nope.qa.local",
+					"sometimes@#$@#%123135.qa.local",
 				},
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
+				MACs: []string{
+					"1C:29:DF:E5:AA:B5",
+					"52:65:06:7A:C5:C8",
+					"37:25:61:C8:B5:9C",
+					"19:62:AD:A7:92:BA",
+					"E5:CF:60:13:C2:3E",
 				},
 			},
 			false,
-		},
-		{
-			"bad-host-options.hcl",
-			&Spec{
-				Name: "default",
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
-				},
-			},
-			false,
-		},
-		{
-			"bad-device-name.hcl",
-			nil,
-			true,
-		},
-		{
-			"foreman.hcl",
-			&Spec{
-				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
-					Devices: Devices{
-						Disks: []*Disk{
-							{
-								DeviceName: "Hard disk 1",
-								DeviceType: "disk",
-								Size:       40,
-							},
-						},
-						Networks: []*Network{
-							{
-								DeviceName: "Network adapter 1",
-								DeviceType: "network",
-								BuildVLAN:  "dv-build",
-								VLAN:       "dv-appservers",
-								SwitchType: "distributed",
-							},
-						},
-						SCSIs: []*SCSI{
-							{
-								DeviceName: "SCSI controller 1",
-								DeviceType: "scsi",
-								Type:       "paravirtual",
-							},
-						},
-					},
-				},
-				Foreman: Foreman{
-					Hostgroup:         "hg01",
-					Location:          "location01",
-					Organization:      "org01",
-					Environment:       "env01",
-					ComputeProfile:    "compute01",
-					ArchitectureID:    6,
-					ComputeResource:   "lol",
-					DomainID:          6,
-					OperatingSystemID: 2,
-					PartitionTableID:  6,
-					Medium:            "centos-7",
-				},
-			},
-			false,
-		},
-		{
-			"chef.hcl",
-			&Spec{
-				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
-					Devices: Devices{
-						Disks: []*Disk{
-							{
-								DeviceName: "Hard disk 1",
-								DeviceType: "disk",
-								Size:       40,
-							},
-						},
-						Networks: []*Network{
-							{
-								DeviceName: "Network adapter 1",
-								DeviceType: "network",
-								BuildVLAN:  "dv-build",
-								VLAN:       "dv-appservers",
-								SwitchType: "distributed",
-							},
-						},
-						SCSIs: []*SCSI{
-							{
-								DeviceName: "SCSI controller 1",
-								DeviceType: "scsi",
-								Type:       "paravirtual",
-							},
-						},
-					},
-				},
-				Chef: Chef{
-					Server:        "https://chef.qa.local",
-					ValidationKey: "~/.chef/validation_key.pem",
-					Environment:   "qa",
-					RunList: []string{
-						"role[role01]",
-						"role[role02]",
-					},
-				},
-			},
-			false,
-		},
-		{
-			"complete.hcl",
-			&Spec{
-				Name: "indy.prod.kafka",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
-					Devices: Devices{
-						Disks: []*Disk{
-							{
-								DeviceName: "Hard disk 1",
-								DeviceType: "disk",
-								Size:       40,
-							},
-						},
-						Networks: []*Network{
-							{
-								DeviceName: "Network adapter 1",
-								DeviceType: "network",
-								BuildVLAN:  "dv-build",
-								VLAN:       "dv-appservers",
-								SwitchType: "distributed",
-							},
-						},
-						SCSIs: []*SCSI{
-							{
-								DeviceName: "SCSI controller 1",
-								DeviceType: "scsi",
-								Type:       "paravirtual",
-							},
-						},
-					},
-				},
-				Foreman: Foreman{
-					Hostgroup:         "hg01",
-					Location:          "location01",
-					Organization:      "org01",
-					Environment:       "env01",
-					ComputeProfile:    "compute01",
-					ArchitectureID:    6,
-					ComputeResource:   "lol",
-					DomainID:          6,
-					OperatingSystemID: 2,
-					PartitionTableID:  6,
-					Medium:            "centos-7",
-				},
-				Chef: Chef{
-					Server:        "https://chef.qa.local",
-					ValidationKey: "~/.chef/validation_key.pem",
-					Environment:   "qa",
-					RunList: []string{
-						"role[role01]",
-						"role[role02]",
-					},
-				},
-			},
-			false,
-		},
-		{
-			"multiple-devices.hcl",
-			&Spec{
-				Name: "indy.prod.kafka",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
-				Vsphere: Vsphere{
-					Domain:     "qa.local",
-					Cluster:    "cluster01",
-					Datastore:  "ds01",
-					Folder:     "folder01",
-					Datacenter: "dc01",
-					Devices: Devices{
-						Disks: []*Disk{
-							{
-								DeviceName: "Hard disk 1",
-								DeviceType: "disk",
-								Size:       40,
-							},
-							{
-								DeviceName: "Hard disk 2",
-								DeviceType: "disk",
-								Size:       200,
-							},
-						},
-						Networks: []*Network{
-							{
-								DeviceName: "Network adapter 1",
-								DeviceType: "network",
-								BuildVLAN:  "dv-build",
-								VLAN:       "dv-appservers",
-								SwitchType: "distributed",
-							},
-							{
-								DeviceName: "Network adapter 2",
-								DeviceType: "network",
-								BuildVLAN:  "",
-								VLAN:       "dv-appservers",
-								SwitchType: "distributed",
-							},
-						},
-						SCSIs: []*SCSI{
-							{
-								DeviceName: "SCSI controller 1",
-								DeviceType: "scsi",
-								Type:       "paravirtual",
-							},
-							{
-								DeviceName: "SCSI controller 2",
-								DeviceType: "scsi",
-								Type:       "paravirtual",
-							},
-						},
-					},
-				},
-				Foreman: Foreman{
-					Hostgroup:         "hg01",
-					Location:          "location01",
-					Organization:      "org01",
-					Environment:       "env01",
-					ComputeProfile:    "compute01",
-					ArchitectureID:    6,
-					ComputeResource:   "lol",
-					DomainID:          6,
-					OperatingSystemID: 2,
-					PartitionTableID:  6,
-					Medium:            "centos-7",
-				},
-				Chef: Chef{
-					Server:        "https://chef.qa.local",
-					ValidationKey: "~/.chef/validation_key.pem",
-					Environment:   "qa",
-					RunList: []string{
-						"role[role01]",
-						"role[role02]",
-					},
-				},
-			},
-			false,
-		},
-		{
-			"bad-same-device-name.hcl",
-			nil,
-			true,
 		},
 	}
 
 	for _, tt := range cases {
-		t.Logf("Testing parse on: %s", tt.File)
+		t.Logf("Starting parse on: %s", tt.File)
 
 		path, err := filepath.Abs(filepath.Join("./test-fixtures", tt.File))
 		if err != nil {
@@ -375,7 +58,7 @@ func TestParse(t *testing.T) {
 		}
 
 		actual, err := ParseFile(path)
-		if (err != nil) != tt.Err {
+		if err != nil {
 			t.Fatalf("file: %s\n\n%s", tt.File, err)
 			continue
 		}

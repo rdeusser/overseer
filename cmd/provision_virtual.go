@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/iamthemuffinman/overseer/config"
+	"github.com/iamthemuffinman/overseer/configspec"
 	"github.com/iamthemuffinman/overseer/pkg/buildspec"
 	"github.com/iamthemuffinman/overseer/pkg/hammer"
 	"github.com/iamthemuffinman/overseer/pkg/hostspec"
@@ -64,10 +64,10 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 			log.Fatalf("unable to retrieve users home directory: %s", err)
 		}
 
-		// Parse overseer's config file which contains usernames and passwords
-		cspec, err := config.ParseFile(fmt.Sprintf("%s/.overseer/overseer.conf", home))
+		// Parse overseer's configspec file which contains usernames and passwords
+		cspec, err := configspec.ParseFile(fmt.Sprintf("%s/.overseer/overseer.conf", home))
 		if err != nil {
-			log.Fatalf("unable to parse overseer config: %s", err)
+			log.Fatalf("unable to parse overseer configspec: %s", err)
 		}
 
 		// Here is where we essentially parse the entire buildspecs directory to find
@@ -194,7 +194,7 @@ func (c *ProvisionVirtualCommand) Run(args []string) int {
 	return 0
 }
 
-// Get user's home directory so we can pass it to the config parser
+// Get user's home directory so we can pass it to the configspec parser
 func getHomeDir() (string, error) {
 	home, err := homedir.Dir()
 	if err != nil {

@@ -16,12 +16,10 @@ func TestParse(t *testing.T) {
 			"basic.hcl",
 			&Spec{
 				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
 				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
 					Domain:     "qa.local",
 					Cluster:    "cluster01",
 					Datastore:  "ds01",
@@ -65,12 +63,10 @@ func TestParse(t *testing.T) {
 			"bad-devices.hcl",
 			&Spec{
 				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
 				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
 					Domain:     "qa.local",
 					Cluster:    "cluster01",
 					Datastore:  "ds01",
@@ -103,12 +99,10 @@ func TestParse(t *testing.T) {
 			"foreman.hcl",
 			&Spec{
 				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
 				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
 					Domain:     "qa.local",
 					Cluster:    "cluster01",
 					Datastore:  "ds01",
@@ -160,12 +154,10 @@ func TestParse(t *testing.T) {
 			"chef.hcl",
 			&Spec{
 				Name: "default",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
 				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
 					Domain:     "qa.local",
 					Cluster:    "cluster01",
 					Datastore:  "ds01",
@@ -213,12 +205,10 @@ func TestParse(t *testing.T) {
 			"complete.hcl",
 			&Spec{
 				Name: "indy.prod.kafka",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
 				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
 					Domain:     "qa.local",
 					Cluster:    "cluster01",
 					Datastore:  "ds01",
@@ -279,12 +269,10 @@ func TestParse(t *testing.T) {
 			"multiple-devices.hcl",
 			&Spec{
 				Name: "indy.prod.kafka",
-				Virtual: Virtual{
-					CPUs:   2,
-					Cores:  1,
-					Memory: 8096,
-				},
 				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
 					Domain:     "qa.local",
 					Cluster:    "cluster01",
 					Datastore:  "ds01",

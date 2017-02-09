@@ -19,7 +19,6 @@ type Spec struct {
 	Foreman Foreman `mapstructure:"foreman"`
 	Chef    Chef    `mapstructure:"chef"`
 	Vsphere Vsphere `mapstructure:"vsphere"`
-	Virtual Virtual `mapstructure:"virtual"`
 }
 
 type Devices struct {
@@ -50,18 +49,15 @@ type Chef struct {
 }
 
 type Vsphere struct {
+	CPUs       int     `mapstructure:"cpus"`
+	Cores      int     `mapstructure:"cores"`
+	Memory     int     `mapstructure:"memory"`
 	Domain     string  `mapstructure:"domain"`
 	Cluster    string  `mapstructure:"cluster"`
 	Datastore  string  `mapstructure:"datastore"`
 	Folder     string  `mapstructure:"folder"`
 	Datacenter string  `mapstructure:"datacenter"`
 	Devices    Devices `mapstructure:"device"`
-}
-
-type Virtual struct {
-	CPUs   int `mapstructure:"cpus"`
-	Cores  int `mapstructure:"cores"`
-	Memory int `mapstructure:"memory"`
 }
 
 type Disk struct {
@@ -189,7 +185,6 @@ func parseSpec(result *Spec, list *ast.ObjectList) error {
 		"foreman",
 		"chef",
 		"vsphere",
-		"virtual",
 	}
 	if err := checkHCLKeys(listVal, valid); err != nil {
 		return multierror.Prefix(err, "spec ->")
@@ -203,7 +198,6 @@ func parseSpec(result *Spec, list *ast.ObjectList) error {
 	delete(m, "foreman")
 	delete(m, "chef")
 	delete(m, "vsphere")
-	delete(m, "virtual")
 
 	var spec Spec
 	if err := mapstructure.WeakDecode(m, &spec); err != nil {
@@ -228,13 +222,6 @@ func parseSpec(result *Spec, list *ast.ObjectList) error {
 	if o := listVal.Filter("vsphere"); len(o.Items) > 0 {
 		if err := parseVsphere(&spec.Vsphere, o); err != nil {
 			return multierror.Prefix(err, "vsphere ->")
-		}
-	}
-
-	// Parse out virtual fields
-	if o := listVal.Filter("virtual"); len(o.Items) > 0 {
-		if err := parseVirtual(&spec.Virtual, o); err != nil {
-			return multierror.Prefix(err, "virtual ->")
 		}
 	}
 
@@ -330,6 +317,9 @@ func parseVsphere(result *Vsphere, list *ast.ObjectList) error {
 	}
 
 	valid := []string{
+		"cpus",
+		"cores",
+		"memory",
 		"domain",
 		"cluster",
 		"datastore",
@@ -361,43 +351,6 @@ func parseVsphere(result *Vsphere, list *ast.ObjectList) error {
 	}
 
 	*result = vsphere
-	return nil
-}
-
-func parseVirtual(result *Virtual, list *ast.ObjectList) error {
-	list = list.Elem()
-	if len(list.Items) > 1 {
-		return fmt.Errorf("only one %q block allowed", "virtual")
-	}
-
-	// Get our virtual object
-	o := list.Items[0]
-
-	var listVal *ast.ObjectList
-	if ot, ok := o.Val.(*ast.ObjectType); ok {
-		listVal = ot.List
-	}
-
-	valid := []string{
-		"cpus",
-		"cores",
-		"memory",
-	}
-	if err := checkHCLKeys(listVal, valid); err != nil {
-		return multierror.Prefix(err, "virtual ->")
-	}
-
-	var m map[string]interface{}
-	if err := hcl.DecodeObject(&m, o.Val); err != nil {
-		return err
-	}
-
-	var virtual Virtual
-	if err := mapstructure.WeakDecode(m, &virtual); err != nil {
-		return err
-	}
-
-	*result = virtual
 	return nil
 }
 

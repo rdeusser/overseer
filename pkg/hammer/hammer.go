@@ -60,9 +60,9 @@ func New(bspec *buildspec.Spec, cspec *configspec.Spec) *Hammer {
 		ComputeProfile:    bspec.Foreman.ComputeProfile,
 		ComputeResource:   bspec.Foreman.ComputeResource,
 		Host: Host{
-			CPUs:   bspec.Virtual.CPUs,
-			Cores:  bspec.Virtual.Cores,
-			Memory: bspec.Virtual.Memory,
+			CPUs:   bspec.Vsphere.CPUs,
+			Cores:  bspec.Vsphere.Cores,
+			Memory: bspec.Vsphere.Memory,
 			Disks:  bspec.Vsphere.Devices.Disks,
 		},
 	}

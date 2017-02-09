@@ -12,13 +12,10 @@ git. Each buildspec should represent an environment or type of host.
 A buildspec looks like this:
 ```hcl
 spec "indy.prod.kafka" {
-    virtual {
+    vsphere {
         cpus = 2
         cores = 1
         memory = 8096
-    }
-
-    vsphere {
         domain = "qa.local"
         cluster = "cluster01"
         datastore = "ds01"

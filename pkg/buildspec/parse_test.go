@@ -202,6 +202,52 @@ func TestParse(t *testing.T) {
 			false,
 		},
 		{
+			"infoblox.hcl",
+			&Spec{
+				Name: "default",
+				Vsphere: Vsphere{
+					CPUs:       2,
+					Cores:      1,
+					Memory:     8096,
+					Domain:     "qa.local",
+					Cluster:    "cluster01",
+					Datastore:  "ds01",
+					Folder:     "folder01",
+					Datacenter: "dc01",
+					Devices: Devices{
+						Disks: []*Disk{
+							{
+								DeviceName: "Hard disk 1",
+								DeviceType: "disk",
+								Size:       40,
+							},
+						},
+						Networks: []*Network{
+							{
+								DeviceName: "Network adapter 1",
+								DeviceType: "network",
+								BuildVLAN:  "dv-build",
+								VLAN:       "dv-appservers",
+								SwitchType: "distributed",
+							},
+						},
+						SCSIs: []*SCSI{
+							{
+								DeviceName: "SCSI controller 1",
+								DeviceType: "scsi",
+								Type:       "paravirtual",
+							},
+						},
+					},
+				},
+				Infoblox: Infoblox{
+					Subnet: "192.168.1.0/24",
+					Zone:   "qa.local",
+				},
+			},
+			false,
+		},
+		{
 			"complete.hcl",
 			&Spec{
 				Name: "indy.prod.kafka",
@@ -239,6 +285,10 @@ func TestParse(t *testing.T) {
 							},
 						},
 					},
+				},
+				Infoblox: Infoblox{
+					Subnet: "192.168.1.0/24",
+					Zone:   "qa.local",
 				},
 				Foreman: Foreman{
 					Hostgroup:         "hg01",

@@ -15,16 +15,11 @@ import (
 )
 
 type Spec struct {
-	Name    string
-	Foreman Foreman `mapstructure:"foreman"`
-	Chef    Chef    `mapstructure:"chef"`
-	Vsphere Vsphere `mapstructure:"vsphere"`
-}
-
-type Devices struct {
-	Disks    []*Disk    `mapstructure:"disk"`
-	Networks []*Network `mapstructure:"network"`
-	SCSIs    []*SCSI    `mapstructure:"scsi"`
+	Name     string
+	Foreman  Foreman  `mapstructure:"foreman"`
+	Chef     Chef     `mapstructure:"chef"`
+	Vsphere  Vsphere  `mapstructure:"vsphere"`
+	Infoblox Infoblox `mapstructure:"infoblox"`
 }
 
 type Foreman struct {
@@ -58,6 +53,17 @@ type Vsphere struct {
 	Folder     string  `mapstructure:"folder"`
 	Datacenter string  `mapstructure:"datacenter"`
 	Devices    Devices `mapstructure:"device"`
+}
+
+type Infoblox struct {
+	Subnet string `mapstructure:"subnet"`
+	Zone   string `mapstructure:"zone"`
+}
+
+type Devices struct {
+	Disks    []*Disk    `mapstructure:"disk"`
+	Networks []*Network `mapstructure:"network"`
+	SCSIs    []*SCSI    `mapstructure:"scsi"`
 }
 
 type Disk struct {
@@ -185,6 +191,7 @@ func parseSpec(result *Spec, list *ast.ObjectList) error {
 		"foreman",
 		"chef",
 		"vsphere",
+		"infoblox",
 	}
 	if err := checkHCLKeys(listVal, valid); err != nil {
 		return multierror.Prefix(err, "spec ->")
@@ -198,6 +205,7 @@ func parseSpec(result *Spec, list *ast.ObjectList) error {
 	delete(m, "foreman")
 	delete(m, "chef")
 	delete(m, "vsphere")
+	delete(m, "infoblox")
 
 	var spec Spec
 	if err := mapstructure.WeakDecode(m, &spec); err != nil {
@@ -222,6 +230,13 @@ func parseSpec(result *Spec, list *ast.ObjectList) error {
 	if o := listVal.Filter("vsphere"); len(o.Items) > 0 {
 		if err := parseVsphere(&spec.Vsphere, o); err != nil {
 			return multierror.Prefix(err, "vsphere ->")
+		}
+	}
+
+	// Parse out infoblox fields
+	if o := listVal.Filter("infoblox"); len(o.Items) > 0 {
+		if err := parseInfoblox(&spec.Infoblox, o); err != nil {
+			return multierror.Prefix(err, "infoblox ->")
 		}
 	}
 
@@ -351,6 +366,37 @@ func parseVsphere(result *Vsphere, list *ast.ObjectList) error {
 	}
 
 	*result = vsphere
+	return nil
+}
+
+func parseInfoblox(result *Infoblox, list *ast.ObjectList) error {
+	list = list.Elem()
+	if len(list.Items) > 1 {
+		return fmt.Errorf("Only one %q block allowed", "infoblox")
+	}
+
+	// Get our "infoblox" object
+	o := list.Items[0]
+
+	valid := []string{
+		"subnet",
+		"zone",
+	}
+	if err := checkHCLKeys(o.Val, valid); err != nil {
+		return err
+	}
+
+	var m map[string]interface{}
+	if err := hcl.DecodeObject(&m, o.Val); err != nil {
+		return err
+	}
+
+	var infoblox Infoblox
+	if err := mapstructure.WeakDecode(m, &infoblox); err != nil {
+		return err
+	}
+
+	*result = infoblox
 	return nil
 }
 
